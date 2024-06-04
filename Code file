@@ -1,0 +1,168 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <limits> // for numeric_limits
+
+using namespace std;
+
+struct Book {
+    int id;
+    string title;
+    string author;
+    bool isIssued;
+
+    Book(int id, string title, string author) : id(id), title(title), author(author), isIssued(false) {}
+};
+
+struct User {
+    int id;
+    string name;
+
+    User(int id, string name) : id(id), name(name) {}
+};
+
+class Library {
+private:
+    vector<Book> books;
+    vector<User> users;
+
+public:
+    void clearInput() {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
+
+    void addBook() {
+        int id;
+        string title, author;
+        cout << "Enter book ID: ";
+        while (!(cin >> id)) {
+            cout << "Invalid input. Please enter an integer for book ID: ";
+            clearInput();
+        }
+        clearInput();
+        cout << "Enter book title: ";
+        getline(cin, title);
+        cout << "Enter book author: ";
+        getline(cin, author);
+        books.push_back(Book(id, title, author));
+        cout << "Book added successfully.\n";
+    }
+
+    void addUser() {
+        int id;
+        string name;
+        cout << "Enter user ID: ";
+        while (!(cin >> id)) {
+            cout << "Invalid input. Please enter an integer for user ID: ";
+            clearInput();
+        }
+        clearInput();
+        cout << "Enter user name: ";
+        getline(cin, name);
+        users.push_back(User(id, name));
+        cout << "User added successfully.\n";
+    }
+
+    void issueBook() {
+        int bookId, userId;
+        cout << "Enter book ID to issue: ";
+        while (!(cin >> bookId)) {
+            cout << "Invalid input. Please enter an integer for book ID: ";
+            clearInput();
+        }
+        cout << "Enter user ID to issue to: ";
+        while (!(cin >> userId)) {
+            cout << "Invalid input. Please enter an integer for user ID: ";
+            clearInput();
+        }
+        auto bookIt = find_if(books.begin(), books.end(), [bookId](Book& book) { return book.id == bookId; });
+        if (bookIt != books.end() && !bookIt->isIssued) {
+            bookIt->isIssued = true;
+            cout << "Book issued successfully to user ID " << userId << ".\n";
+        } else {
+            cout << "Book not available for issue.\n";
+        }
+    }
+
+    void returnBook() {
+        int bookId;
+        cout << "Enter book ID to return: ";
+        while (!(cin >> bookId)) {
+            cout << "Invalid input. Please enter an integer for book ID: ";
+            clearInput();
+        }
+        auto bookIt = find_if(books.begin(), books.end(), [bookId](Book& book) { return book.id == bookId; });
+        if (bookIt != books.end() && bookIt->isIssued) {
+            bookIt->isIssued = false;
+            cout << "Book returned successfully.\n";
+        } else {
+            cout << "Book was not issued.\n";
+        }
+    }
+
+    void displayBooks() {
+        cout << "Books in the library:\n";
+        for (const auto& book : books) {
+            cout << "ID: " << book.id << ", Title: " << book.title << ", Author: " << book.author << ", Issued: " << (book.isIssued ? "Yes" : "No") << "\n";
+        }
+    }
+
+    void displayUsers() {
+        cout << "Users in the library:\n";
+        for (const auto& user : users) {
+            cout << "ID: " << user.id << ", Name: " << user.name << "\n";
+        }
+    }
+};
+
+int main() {
+    Library library;
+    int choice;
+
+    while (true) {
+        cout << "\nLibrary Management System\n";
+        cout << "1. Add Book\n";
+        cout << "2. Add User\n";
+        cout << "3. Issue Book\n";
+        cout << "4. Return Book\n";
+        cout << "5. Display Books\n";
+        cout << "6. Display Users\n";
+        cout << "7. Exit\n";
+        cout << "Enter your choice: ";
+        if (!(cin >> choice)) {
+            cout << "Invalid input. Please enter a number between 1 and 7.\n";
+            library.clearInput();
+            continue;
+        }
+
+        switch (choice) {
+            case 1:
+                library.addBook();
+                break;
+            case 2:
+                library.addUser();
+                break;
+            case 3:
+                library.issueBook();
+                break;
+            case 4:
+                library.returnBook();
+                break;
+            case 5:
+                library.displayBooks();
+                break;
+            case 6:
+                library.displayUsers();
+                break;
+            case 7:
+                cout << "Exiting the program.\n";
+                return 0;
+            default:
+                cout << "Invalid choice. Please try again.\n";
+        }
+    }
+
+    return 0;
+}
